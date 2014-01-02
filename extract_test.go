@@ -1,6 +1,7 @@
 package extract
 
 import (
+	"net/url"
 	"reflect"
 	"strings"
 	"testing"
@@ -22,24 +23,33 @@ func TestMetadataExtractor(t *testing.T) {
 <html>
 <head>
 <title>Hello there.</title>
-<link rel="canonical" href="http://www.example.com/" />
+<link rel="canonical" href="http://www.example.com/posts/2" />
+<link rel="next" href="./3" />
+<link rel="all" href="all" />
+<link rel="all_short" href="all/short" />
+<link rel="home" href="../.." />
 <meta property="og:site_name" content="Hello Site" />
 <meta property="og:title" content="Also hello." />
 <meta property="og:description" content="This page doesn't have a whole lot going on." />
 <meta name="description" content="Different description" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://example.com/" />
-<meta property="og:image" content="http://placehold.it/80x60" />
+<meta property="og:image" content="/80x60.png" />
 </head>
 </html>
 `
-	meta := NewMetadataExtractor()
+	url, _ := url.Parse("http://example.com/posts/2")
+	meta := NewMetadataExtractor(url)
 	err := Extract(strings.NewReader(doc), meta)
 	if err != nil {
 		t.Error(err)
 	}
 	expectedFields := []ExpectedField{
-		e(c{"link_rel_canonical"}, "link_rel_canonical", "http://www.example.com/", "linkRel"),
+		e(c{"link_rel_canonical"}, "link_rel_canonical", "http://www.example.com/posts/2", "linkRel"),
+		e(c{"link_rel_next"}, "link_rel_next", "http://example.com/posts/3", "linkRel"),
+		e(c{"link_rel_all"}, "link_rel_all", "http://example.com/posts/all", "linkRel"),
+		e(c{"link_rel_all_short"}, "link_rel_all_short", "http://example.com/posts/all/short", "linkRel"),
+		e(c{"link_rel_home"}, "link_rel_home", "http://example.com/", "linkRel"),
 		e(c{"site_name", "og_site_name"}, "og_site_name", "Hello Site", "og"),
 		e(c{"title", "og_title"}, "og_title", "Also hello.", "og"),
 		e(c{"title_tag"}, "title_tag", "Hello there.", "title_tag"),
@@ -47,7 +57,7 @@ func TestMetadataExtractor(t *testing.T) {
 		e(c{"meta_description"}, "meta_description", "Different description", "meta"),
 		e(c{"type"}, "og_type", "article", "og"),
 		e(c{"url"}, "og_url", "http://example.com/", "og"),
-		e(c{"image"}, "og_image", "http://placehold.it/80x60", "og"),
+		e(c{"image"}, "og_image", "http://example.com/80x60.png", "og"),
 	}
 	for _, expected := range expectedFields {
 		for _, key := range expected.keys {
