@@ -31,3 +31,11 @@ func Extract(r io.Reader, extractor Extractor) error {
 	}
 
 }
+
+type MultiExtractor []Extractor
+
+func (extractors MultiExtractor) HandleToken(token html.Token) {
+	for _, extractor := range extractors {
+		extractor.HandleToken(token)
+	}
+}
