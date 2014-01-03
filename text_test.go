@@ -49,6 +49,7 @@ func TestPlaintextTextExtractor(t *testing.T) {
            <h1>That style tag.</h1>
            It should be ignored!</body>`,
 			"That style tag. It should be ignored!"},
+		{"<ul><li><a>one</a></li><li><a>two</a></li></ul>", "one two"},
 	}
 
 	for _, test := range tests {

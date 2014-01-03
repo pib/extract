@@ -37,10 +37,15 @@ var (
 	}
 )
 
+func (t *TextExtractor) String() string {
+	return string(bytes.TrimSpace(t.Buffer.Bytes()))
+}
+
 func (t *TextExtractor) HandleToken(token html.Token) {
 	switch token.Type {
 	case html.StartTagToken:
 		t.push(token.DataAtom)
+		t.maybeSpace()
 
 		switch token.DataAtom {
 		// Upon hitting a opening body tag, clear the content seen so
@@ -68,17 +73,22 @@ func (t *TextExtractor) HandleToken(token html.Token) {
 		if t.ignoring != 0 {
 			return
 		}
+		t.maybeSpace()
+
 		words := strings.Fields(token.Data)
 		if len(words) > 0 {
-			if !t.inline && t.Len() > 0 {
-				t.WriteString(" ")
-			}
 			t.WriteString(words[0])
 			for _, word := range words[1:] {
 				t.WriteString(" ")
 				t.WriteString(word)
 			}
 		}
+	}
+}
+
+func (t *TextExtractor) maybeSpace() {
+	if !t.inline && t.Len() > 0 && !bytes.HasSuffix(t.Bytes(), []byte(" ")) {
+		t.WriteString(" ")
 	}
 }
 
