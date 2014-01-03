@@ -46,6 +46,6 @@ type DebugExtractor struct {
 }
 
 func (de DebugExtractor) HandleToken(token html.Token) {
-	fmt.Printf("Type: %s, DataAtom: \"%s\"(%d), Data: \"%s\", Attr: %v\n", token.Type, token.DataAtom, token.DataAtom, token.Data, token.Attr)
+	fmt.Printf("%-8s %-6s %-8v %#v\n", token.Type, token.DataAtom, token.Attr, token.Data)
 	de.Extractor.HandleToken(token)
 }

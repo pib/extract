@@ -68,11 +68,11 @@ func (t *TextExtractor) HandleToken(token html.Token) {
 		if t.ignoring != 0 {
 			return
 		}
-		if !t.inline && t.Len() > 0 {
-			t.WriteString(" ")
-		}
 		words := strings.Fields(token.Data)
 		if len(words) > 0 {
+			if !t.inline && t.Len() > 0 {
+				t.WriteString(" ")
+			}
 			t.WriteString(words[0])
 			for _, word := range words[1:] {
 				t.WriteString(" ")
