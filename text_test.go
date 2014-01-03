@@ -13,6 +13,7 @@ type TestPair struct {
 func TestPlaintextTextExtractor(t *testing.T) {
 	tests := []TestPair{
 		{"Not really HTML, even.", "Not really HTML, even."},
+		{"Ignore <!-- blah blah --> the <!-- pointless --> comments", "Ignore the comments"},
 		{"<html><body>This one has a body, at least.</body></html>", "This one has a body, at least."},
 		{`<html><head><title>Title isn't part of the text.</title></head>
           <body>Woop, getting a bit tricker.</body></html>`,
