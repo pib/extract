@@ -23,6 +23,9 @@ func TestPlaintextTextExtractor(t *testing.T) {
 		{`<html><head><title>Title isn't part of the text.</title></head>
           <body><h1>Heyo.</h1>Implicit<p>whitespace!</p></body>`,
 			"Heyo. Implicit whitespace!"},
+		{`<html><head><title>Title isn't part of the text.</title></head>
+          <body><b>Heyo.</b>No Implicit<span>whitespace!</span></body>`,
+			"Heyo.No Implicitwhitespace!"},
 		{"Compressed   \t\n  whitespace", "Compressed whitespace"},
 		{`<html><head><title>Title isn't part of the text.</title></head>
           <body>

@@ -19,11 +19,11 @@ type MetadataField struct {
 
 type Metadata map[string]MetadataField
 
-var ogUrlFields = map[string]bool{
-	"url":   true,
-	"image": true,
-	"audio": true,
-	"video": true,
+var ogUrlFields = map[string]struct{}{
+	"url":   {},
+	"image": {},
+	"audio": {},
+	"video": {},
 }
 
 func (meta Metadata) Set(commonKey string, field MetadataField) {
