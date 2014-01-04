@@ -16,8 +16,8 @@ func TestPlaintextTextExtractor(t *testing.T) {
 		{"Ignore <!-- blah blah --> the <!-- pointless --> comments", "Ignore the comments"},
 		{"<html><body>This one has a body, at least.</body></html>", "This one has a body, at least."},
 		{`<html><head><title>Title isn't part of the text.</title></head>
-          <body>Woop, getting a bit tricker.</body></html>`,
-			"Woop, getting a bit tricker."},
+          <body>Woop, getting a bit tricker.⚃</body></html>`,
+			"Woop, getting a bit tricker.⚃"},
 		{`<html><head><title>Title isn't part of the text.</title>
             </head>Somebody messed this file up severely.`,
 			"Somebody messed this file up severely."},
@@ -39,7 +39,8 @@ func TestPlaintextTextExtractor(t *testing.T) {
            <h1>That script tag.</h1>
            It should be ignored!</body>`,
 			"That script tag. It should be ignored!"},
-		{`<html>
+		{`<?xml version="1.0" encoding="UTF-8"?>
+<html>
           <body>
            <style>
              body {
@@ -54,7 +55,7 @@ func TestPlaintextTextExtractor(t *testing.T) {
 
 	for _, test := range tests {
 		text := NewTextExtractor()
-		err := Extract(strings.NewReader(test.in), text)
+		err := Extract(strings.NewReader(test.in), DebugExtractor{text})
 		if err != nil {
 			t.Error(err)
 		}
