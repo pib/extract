@@ -76,8 +76,7 @@ func (t *TextExtractor) HandleToken(token html.Token) {
 		}
 		t.maybeSpace()
 
-		firstChar := rune(token.Data[0])
-		if t.inline && unicode.IsSpace(firstChar) {
+		if firstChar := rune(token.Data[0]); t.inline && unicode.IsSpace(firstChar) {
 			t.WriteString(" ")
 		}
 		words := strings.Fields(token.Data)
@@ -88,8 +87,7 @@ func (t *TextExtractor) HandleToken(token html.Token) {
 				t.WriteString(word)
 			}
 		}
-		lastChar := rune(token.Data[len(token.Data)-1])
-		if t.inline && unicode.IsSpace(lastChar) {
+		if lastChar := rune(token.Data[len(token.Data)-1]); t.inline && unicode.IsSpace(lastChar) {
 			t.WriteString(" ")
 		}
 	}
