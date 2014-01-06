@@ -46,7 +46,9 @@ func (t *TextExtractor) HandleToken(token html.Token) {
 	switch token.Type {
 	case html.StartTagToken:
 		t.push(token.DataAtom)
-		t.maybeSpace()
+		if !t.inline {
+			t.maybeSpace()
+		}
 
 		switch token.DataAtom {
 		// Upon hitting a opening body tag, clear the content seen so
@@ -61,6 +63,9 @@ func (t *TextExtractor) HandleToken(token html.Token) {
 		}
 	case html.EndTagToken:
 		t.maybePop(token.DataAtom)
+		if !t.inline {
+			t.maybeSpace()
+		}
 
 		switch token.DataAtom {
 		case atom.Head:
@@ -74,11 +79,11 @@ func (t *TextExtractor) HandleToken(token html.Token) {
 		if t.ignoring != 0 {
 			return
 		}
-		t.maybeSpace()
 
-		if firstChar := rune(token.Data[0]); t.inline && unicode.IsSpace(firstChar) {
-			t.WriteString(" ")
+		if unicode.IsSpace(rune(token.Data[0])) {
+			t.maybeSpace()
 		}
+
 		words := strings.Fields(token.Data)
 		if len(words) > 0 {
 			t.WriteString(words[0])
@@ -87,14 +92,14 @@ func (t *TextExtractor) HandleToken(token html.Token) {
 				t.WriteString(word)
 			}
 		}
-		if lastChar := rune(token.Data[len(token.Data)-1]); t.inline && unicode.IsSpace(lastChar) {
-			t.WriteString(" ")
+		if unicode.IsSpace(rune(token.Data[len(token.Data)-1])) {
+			t.maybeSpace()
 		}
 	}
 }
 
 func (t *TextExtractor) maybeSpace() {
-	if !t.inline && t.Len() > 0 && !bytes.HasSuffix(t.Bytes(), []byte(" ")) {
+	if t.Len() > 0 && !bytes.HasSuffix(t.Bytes(), []byte(" ")) {
 		t.WriteString(" ")
 	}
 }

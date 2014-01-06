@@ -53,6 +53,8 @@ func TestPlaintextTextExtractor(t *testing.T) {
 		{"<ul><li><a>one</a></li><li><a>two</a></li></ul>", "one two"},
 		{"<strong> Blah<i> blah</i></strong>, blah? Blah blah. <a>Blar.</a>",
 			"Blah blah, blah? Blah blah. Blar."},
+		{"<p>a <em>b</em> <img/>  c d</p>",
+			"a b c d"},
 	}
 
 	for _, test := range tests {
