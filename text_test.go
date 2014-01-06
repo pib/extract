@@ -55,7 +55,7 @@ func TestPlaintextTextExtractor(t *testing.T) {
 
 	for _, test := range tests {
 		text := NewTextExtractor()
-		err := Extract(strings.NewReader(test.in), DebugExtractor{text})
+		err := Extract(strings.NewReader(test.in), text)
 		if err != nil {
 			t.Error(err)
 		}
