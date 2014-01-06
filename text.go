@@ -5,6 +5,7 @@ import (
 	"code.google.com/p/go.net/html"
 	"code.google.com/p/go.net/html/atom"
 	"strings"
+	"unicode"
 )
 
 type TextExtractor struct {
@@ -82,6 +83,10 @@ func (t *TextExtractor) HandleToken(token html.Token) {
 				t.WriteString(" ")
 				t.WriteString(word)
 			}
+		}
+		lastChar := rune(token.Data[len(token.Data)-1])
+		if t.inline && unicode.IsSpace(lastChar) {
+			t.WriteString(" ")
 		}
 	}
 }
