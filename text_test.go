@@ -51,7 +51,7 @@ func TestPlaintextTextExtractor(t *testing.T) {
            It should be ignored!</body>`,
 			"That style tag. It should be ignored!"},
 		{"<ul><li><a>one</a></li><li><a>two</a></li></ul>", "one two"},
-		{"<strong>Blah blah</strong>, blah? Blah blah. <a>Blar.</a>",
+		{"<strong> Blah<i> blah</i></strong>, blah? Blah blah. <a>Blar.</a>",
 			"Blah blah, blah? Blah blah. Blar."},
 	}
 

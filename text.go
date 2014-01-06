@@ -76,6 +76,10 @@ func (t *TextExtractor) HandleToken(token html.Token) {
 		}
 		t.maybeSpace()
 
+		firstChar := rune(token.Data[0])
+		if t.inline && unicode.IsSpace(firstChar) {
+			t.WriteString(" ")
+		}
 		words := strings.Fields(token.Data)
 		if len(words) > 0 {
 			t.WriteString(words[0])
