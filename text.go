@@ -76,25 +76,29 @@ func (t *TextExtractor) HandleToken(token html.Token) {
 			}
 		}
 	case html.TextToken:
-		if t.ignoring != 0 {
-			return
-		}
+		t.writeSpaceCompressed(token.Data)
+	}
+}
 
-		if unicode.IsSpace(rune(token.Data[0])) {
-			t.maybeSpace()
-		}
+func (t *TextExtractor) writeSpaceCompressed(s string) {
+	if t.ignoring != 0 {
+		return
+	}
 
-		words := strings.Fields(token.Data)
-		if len(words) > 0 {
-			t.WriteString(words[0])
-			for _, word := range words[1:] {
-				t.WriteString(" ")
-				t.WriteString(word)
-			}
+	if unicode.IsSpace(rune(s[0])) {
+		t.maybeSpace()
+	}
+
+	words := strings.Fields(s)
+	if len(words) > 0 {
+		t.WriteString(words[0])
+		for _, word := range words[1:] {
+			t.WriteString(" ")
+			t.WriteString(word)
 		}
-		if unicode.IsSpace(rune(token.Data[len(token.Data)-1])) {
-			t.maybeSpace()
-		}
+	}
+	if unicode.IsSpace(rune(s[len(s)-1])) {
+		t.maybeSpace()
 	}
 }
 
