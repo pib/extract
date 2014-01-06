@@ -44,6 +44,13 @@ func (t *TextExtractor) String() string {
 
 func (t *TextExtractor) HandleToken(token html.Token) {
 	switch token.Type {
+	case html.SelfClosingTagToken:
+		switch token.DataAtom {
+		case atom.Img, atom.Area:
+			if alt, exists := Attr(token, "alt"); exists {
+				t.writeSpaceCompressed(alt)
+			}
+		}
 	case html.StartTagToken:
 		t.push(token.DataAtom)
 		if !t.inline {
