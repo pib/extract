@@ -92,7 +92,7 @@ func (t *TextExtractor) writeSpaceCompressed(s string) {
 		return
 	}
 
-	if unicode.IsSpace(rune(s[0])) {
+	if len(s) > 0 && unicode.IsSpace(rune(s[0])) {
 		t.maybeSpace()
 	}
 
@@ -104,7 +104,7 @@ func (t *TextExtractor) writeSpaceCompressed(s string) {
 			t.WriteString(word)
 		}
 	}
-	if unicode.IsSpace(rune(s[len(s)-1])) {
+	if len(s) > 0 && unicode.IsSpace(rune(s[len(s)-1])) {
 		t.maybeSpace()
 	}
 }
