@@ -33,6 +33,14 @@ func (meta Metadata) Set(commonKey string, field MetadataField) {
 	}
 }
 
+func (meta Metadata) Dict() map[string]string {
+	dict := make(map[string]string)
+	for key, val := range meta {
+		dict[key] = val.Value
+	}
+	return dict
+}
+
 // A MetadataExtractor gathers metadata from OpenGraph and other meta
 // tags, as well as from the title tag and link tags with rel
 // attributes. For attributes containing URLs, it will transform them
