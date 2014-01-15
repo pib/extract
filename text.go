@@ -36,6 +36,12 @@ var (
 		atom.Span: {}, atom.Strong: {}, atom.Sub: {}, atom.Sup: {},
 		atom.Textarea: {}, atom.Tt: {}, atom.Var: {},
 	}
+	voidElements = map[atom.Atom]struct{}{
+		atom.Area: {}, atom.Base: {}, atom.Br: {}, atom.Col: {},
+		atom.Command: {}, atom.Embed: {}, atom.Hr: {}, atom.Img: {},
+		atom.Input: {}, atom.Keygen: {}, atom.Link: {}, atom.Meta: {},
+		atom.Param: {}, atom.Source: {}, atom.Track: {}, atom.Wbr: {},
+	}
 )
 
 func (t *TextExtractor) String() string {
@@ -45,6 +51,7 @@ func (t *TextExtractor) String() string {
 func (t *TextExtractor) HandleToken(token html.Token) {
 	switch token.Type {
 	case html.SelfClosingTagToken:
+		t.maybeSpace() // Self-closing tags take up some amount of space, so implicit whitespace
 		switch token.DataAtom {
 		case atom.Img, atom.Area:
 			if alt, exists := Attr(token, "alt"); exists {
@@ -52,6 +59,20 @@ func (t *TextExtractor) HandleToken(token html.Token) {
 			}
 		}
 	case html.StartTagToken:
+		// In html5, "self-closing" tags no longer require the "/",
+		// but this parser doesn't seem to know that, so we have to
+		// check for those elements ourselves.
+		if _, ok := voidElements[token.DataAtom]; ok {
+			t.maybeSpace() // Self-closing tags take up some amount of space, so implicit whitespace
+			switch token.DataAtom {
+			case atom.Img, atom.Area:
+				if alt, exists := Attr(token, "alt"); exists {
+					t.writeSpaceCompressed(alt)
+				}
+			}
+			return
+		}
+
 		t.push(token.DataAtom)
 		if !t.inline {
 			t.maybeSpace()
