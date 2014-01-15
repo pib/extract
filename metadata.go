@@ -57,11 +57,6 @@ func NewMetadataExtractor(baseUrl *url.URL) *MetadataExtractor {
 
 func (meta *MetadataExtractor) HandleToken(token html.Token) {
 	switch token.Type {
-	case html.StartTagToken:
-		switch token.DataAtom {
-		case atom.Title:
-			meta.inTitle = true
-		}
 	case html.TextToken:
 		if _, titleSet := meta.Metadata["title"]; meta.inTitle && !titleSet {
 			title := strings.TrimSpace(token.Data)
@@ -73,8 +68,11 @@ func (meta *MetadataExtractor) HandleToken(token html.Token) {
 		case atom.Title:
 			meta.inTitle = false
 		}
-	case html.SelfClosingTagToken:
+	// Self-closing tags may not have "/", so watch start tags as well
+	case html.SelfClosingTagToken, html.StartTagToken:
 		switch token.DataAtom {
+		case atom.Title:
+			meta.inTitle = true
 		case atom.Meta:
 			if prop, _ := Attr(token, "property"); strings.HasPrefix(prop, "og:") {
 				key := strings.TrimPrefix(prop, "og:")
@@ -102,6 +100,11 @@ func (meta *MetadataExtractor) HandleToken(token html.Token) {
 
 				if rel == "canonical" {
 					meta.Metadata.Set("url", field)
+				} else if rel == "icon" {
+					field.Weight = 1
+					meta.Metadata.Set("favicon", field)
+				} else if rel == "shortcut icon" {
+					meta.Metadata.Set("favicon", field)
 				} else {
 					meta.Metadata[key] = field
 				}
