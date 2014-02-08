@@ -11,6 +11,7 @@ import (
 type TextExtractor struct {
 	bytes.Buffer
 	ignoring    atom.Atom
+	ignoreDepth int
 	inline      bool
 	currentElem atom.Atom
 	elemStack   []atom.Atom
@@ -21,6 +22,9 @@ func NewTextExtractor() *TextExtractor {
 }
 
 var (
+	ignoreIds = map[string]struct{}{
+		"disquis_thread": {},
+	}
 	ignoreElements = map[atom.Atom]struct{}{
 		atom.Audio: {}, atom.Canvas: {}, atom.Command: {}, atom.Embed: {},
 		atom.Iframe: {}, atom.Map: {}, atom.Math: {}, atom.Menu: {},
@@ -88,6 +92,12 @@ func (t *TextExtractor) HandleToken(token html.Token) {
 			if _, ignore := ignoreElements[token.DataAtom]; ignore && t.ignoring == 0 {
 				t.ignoring = token.DataAtom
 			}
+			if id, exists := Attr(token, "id"); exists {
+				if _, ignore := ignoreIds[id]; ignore && t.ignoring == 0 {
+					t.ignoreDepth = 1
+					t.ignoring = token.DataAtom
+				}
+			}
 		}
 	case html.EndTagToken:
 		t.maybePop(token.DataAtom)
@@ -99,7 +109,7 @@ func (t *TextExtractor) HandleToken(token html.Token) {
 		case atom.Head:
 			t.Reset()
 		default:
-			if token.DataAtom != 0 && token.DataAtom == t.ignoring {
+			if token.DataAtom != 0 && token.DataAtom == t.ignoring && t.ignoreDepth == 0 {
 				t.ignoring = 0
 			}
 		}
@@ -140,6 +150,9 @@ func (t *TextExtractor) push(elem atom.Atom) {
 	t.currentElem = elem
 	t.elemStack = append(t.elemStack, elem)
 	_, t.inline = inlineElements[elem]
+	if t.ignoreDepth != 0 {
+		t.ignoreDepth += 1
+	}
 }
 
 // Pop the top element from the stack, but only if the closing tag
@@ -154,4 +167,8 @@ func (t *TextExtractor) maybePop(closing atom.Atom) {
 	}
 	t.elemStack = t.elemStack[:i]
 	_, t.inline = inlineElements[elem]
+	if t.ignoreDepth != 0 {
+		t.ignoreDepth -= 1
+	}
+
 }
