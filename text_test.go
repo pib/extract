@@ -56,7 +56,8 @@ func TestPlaintextTextExtractor(t *testing.T) {
 		{`<p>a <em>b</em> <img/>  c d</p>`, "a b c d"},
 		{`<p>a <em>b</em> <img alt=";)"/>  c d</p>`, "a b ;) c d"},
 		{`<img alt="a b" /><br/>c d`, "a b c d"},
-		{`Hello<div id="disquis_thread">This should be ignored</div>There`, "Hello There"},
+		{`Hello<div id="disqus_thread">This should be ignored</div>There`, "Hello There"},
+		{`Cookie Cookie <em>Cookie</em><div id="disqus_thread">DAMNIT</div>`, "Cookie Cookie Cookie"},
 	}
 
 	for _, test := range tests {

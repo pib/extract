@@ -23,7 +23,7 @@ func NewTextExtractor() *TextExtractor {
 
 var (
 	ignoreIds = map[string]struct{}{
-		"disquis_thread": {},
+		"disqus_thread": {},
 	}
 	ignoreElements = map[atom.Atom]struct{}{
 		atom.Audio: {}, atom.Canvas: {}, atom.Command: {}, atom.Embed: {},
@@ -95,6 +95,7 @@ func (t *TextExtractor) HandleToken(token html.Token) {
 			if id, exists := Attr(token, "id"); exists {
 				if _, ignore := ignoreIds[id]; ignore && t.ignoring == 0 {
 					t.ignoreDepth = 1
+
 					t.ignoring = token.DataAtom
 				}
 			}
