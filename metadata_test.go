@@ -7,18 +7,18 @@ import (
 	"testing"
 )
 
-type ExpectedField struct {
-	keys []string
-	meta MetadataField
-}
-
-func e(keys []string, key, val, source string) ExpectedField {
-	return ExpectedField{keys, MetadataField{key, val, source, 0}}
-}
-
-type c []string
-
 func TestMetadataExtractor(t *testing.T) {
+	type ExpectedField struct {
+		keys []string
+		meta MetadataField
+	}
+
+	e := func(keys []string, key, val, source string) ExpectedField {
+		return ExpectedField{keys, MetadataField{key, val, source, 0}}
+	}
+
+	type c []string
+
 	doc := `
 <html>
 <head>
