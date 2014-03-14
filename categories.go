@@ -54,18 +54,11 @@ func (c *CategoryExtractor) HandleToken(token html.Token) {
 	}
 }
 
-func (c CategoryExtractor) Dict() map[string][]string {
-	categories := make([]string, len(c.Categories))
-	tags := make([]string, len(c.Tags))
+func (c Classification) ToList() []string {
+	list := make([]string, 0, len(c))
 
-	for key, _ := range c.Categories {
-		categories = append(categories, key)
+	for key, _ := range c {
+		list = append(list, key)
 	}
-	for key, _ := range c.Tags {
-		tags = append(tags, key)
-	}
-	return map[string][]string{
-		"categories": categories,
-		"tags":       tags,
-	}
+	return list
 }
